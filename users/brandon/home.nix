@@ -42,7 +42,8 @@
   teams
   remmina
   openconnect
-  (python3.withPackages(ps: with ps; [pip]))
+  #(python3.withPackages(ps: with ps; [pip]))
+  python3
   picocom
   gh
   wget
@@ -50,6 +51,15 @@
   git-crypt
   gnupg
   pinentry_qt
+  util-linux
+  gimp
+  libreoffice
+  simplenote
+  obs-studio
+  steam
+  teamviewer
+  wireshark
+  nmap
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello

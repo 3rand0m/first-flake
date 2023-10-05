@@ -48,6 +48,8 @@
 
   # Enable the Pantheon Desktop Environment.
   services.xserver.displayManager.lightdm.enable = true;
+  services.xserver.displayManager.lightdm.greeters.pantheon.enable = false;
+  services.xserver.displayManager.lightdm.greeters.gtk.enable = true;
   services.xserver.desktopManager.pantheon.enable = true;
 
   # Configure keymap in X11
@@ -83,7 +85,7 @@
   users.users.brandonb = {
     isNormalUser = true;
     description = "Brandon Bergerson";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "vboxsf" ];
     packages = with pkgs; [
     ];
   };
@@ -129,7 +131,14 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "23.05"; # Did you read the comment?
- 
-  nix. settings.experimental-features = [ "nix-command" "flakes" ];
-
+  
+  nix = {
+    extraOptions = "experimental-features = nix-command flakes";
+    package = pkgs.nixFlakes;
+  }; 
+  nixpkgs.config.permittedInsecurePackages = [
+    "teams-1.5.00.23861"
+    "openssl-1.1.1w"
+    "openssl-1.1.1v"
+  ];
 }
