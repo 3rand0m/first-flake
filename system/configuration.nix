@@ -136,5 +136,5 @@
     "openssl-1.1.1v"
   ];
 
-  system.stateVersion = "23.05";
+  system.stateVersion = "24.11";
 }
