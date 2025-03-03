@@ -1,5 +1,5 @@
 # Edit this configuration file to define what should be installed on
- # your system.  Help is available in the configuration.nix(5) man page
+# your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, ... }:
@@ -10,27 +10,19 @@
       ./hardware-configuration.nix
     ];
 
-  # Bootloader.
+  # Bootloader
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
 
-  networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
+  networking.hostName = "nixos"; # Define your hostname
   networking.networkmanager.enable = true;
 
-  # Set your time zone.
+  # Set your time zone
   time.timeZone = "America/Chicago";
 
-  # Select internationalisation properties.
+  # Internationalisation properties
   i18n.defaultLocale = "en_US.UTF-8";
-
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "en_US.UTF-8";
     LC_IDENTIFICATION = "en_US.UTF-8";
@@ -43,25 +35,25 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  # Enable the X11 windowing system.
+  # Enable X11 and Wayland requirements
   services.xserver.enable = true;
-
-  # Enable the Pantheon Desktop Environment.
-  services.xserver.displayManager.lightdm.enable = true;
-  services.xserver.displayManager.lightdm.greeters.pantheon.enable = false;
-  services.xserver.displayManager.lightdm.greeters.gtk.enable = true;
-  services.xserver.desktopManager.pantheon.enable = true;
-
-  # Configure keymap in X11
+  programs.hyprland.enable = true;  # Enable Hyprland Wayland compositor
+  programs.hyprland.xwayland.enable = true;  # Enable XWayland support
+  
+  # Enable SDDM display manager (commonly used with Hyprland)
+  services.xserver.displayManager.sddm.enable = true;
+  services.xserver.displayManager.defaultSession = "hyprland";
+  
+  # Configure keymap
   services.xserver = {
     layout = "us";
     xkbVariant = "";
   };
 
-  # Enable CUPS to print documents.
+  # Enable CUPS for printing
   services.printing.enable = true;
 
-  # Enable sound with pipewire.
+  # Audio configuration with PipeWire
   sound.enable = true;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -70,75 +62,83 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
   };
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
+  # User account
   users.users.brandonb = {
     isNormalUser = true;
     description = "Brandon Bergerson";
-    extraGroups = [ "networkmanager" "wheel" "vboxsf" ];
+    extraGroups = [ "networkmanager" "wheel" "vboxsf" "video" "input" ];
     packages = with pkgs; [
+      # Hyprland-specific utilities
+      waybar              # Status bar
+      dunst               # Notification daemon
+      rofi-wayland        # Application launcher
+      hyprpaper           # Wallpaper utility
+      wlogout             # Logout menu
+      grim                # Screenshot tool
+      slurp               # Region selection for screenshots
+      wl-clipboard        # Wayland clipboard utilities
+      xdg-desktop-portal-hyprland  # XDG desktop integration
+      
+      # Common terminal and tools
+      kitty             # Terminal emulator
+      firefox           # Web browser
+      libnotify         # For notifications
     ];
   };
 
-  # Enable automatic login for the user.
+  # Enable automatic login
   services.xserver.displayManager.autoLogin.enable = true;
   services.xserver.displayManager.autoLogin.user = "brandonb";
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+  
+  # VirtualBox guest
   virtualisation.virtualbox.guest.enable = true;
   virtualisation.virtualbox.guest.x11 = true;
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
+
+  # System packages
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
+    # Core utilities
+    vim
+    wget
+    
+    # Additional Hyprland utilities
+    brightnessctl     # Brightness control
+    pamixer           # Audio mixer
+    playerctl         # Media player control
+    networkmanagerapplet  # Network manager tray
+    
+    # File manager (optional)
+    dolphin
   ];
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
+  # Fonts (commonly used with Hyprland)
+  fonts.packages = with pkgs; [
+    font-awesome
+    noto-fonts
+    noto-fonts-emoji
+    fira-code
+    jetbrains-mono
+  ];
 
-  # List services that you want to enable:
+  # Enable necessary services for Hyprland
+  xdg.portal.enable = true;
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
 
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "23.05"; # Did you read the comment?
-  
+  # Nix settings
   nix = {
     extraOptions = "experimental-features = nix-command flakes";
     package = pkgs.nixFlakes;
-  }; 
+  };
+  
   nixpkgs.config.permittedInsecurePackages = [
     "teams-1.5.00.23861"
     "openssl-1.1.1w"
     "openssl-1.1.1v"
   ];
+
+  system.stateVersion = "23.05";
 }
