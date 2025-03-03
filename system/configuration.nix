@@ -65,7 +65,7 @@
   };
 
   # User account
-  users.users.brandonb = {
+  users.users.brandom = {
     isNormalUser = true;
     description = "Brandon Bergerson";
     extraGroups = [ "networkmanager" "wheel" "vboxsf" "video" "input" ];
@@ -94,10 +94,6 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-  
-  # VirtualBox guest
-  virtualisation.virtualbox.guest.enable = true;
-  virtualisation.virtualbox.guest.x11 = true;
 
   # System packages
   environment.systemPackages = with pkgs; [
